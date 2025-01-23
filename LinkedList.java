@@ -5,7 +5,7 @@ public class LinkedList {
 	
 	private Node first; // pointer to the first element of this list
 	private Node last;  // pointer to the last element of this list
-	private int size;   // number of elements in this list
+	public int size;   // number of elements in this list
 	
 	/**
 	 * Constructs a new list.
@@ -94,8 +94,8 @@ public class LinkedList {
 	 */
 	public void addLast(MemoryBlock block) {
 		Node n = new Node(block);
-			last.next = n;
-			last = n;
+		last.next = n;
+		last = n;
 		size++;
 	}
 	
@@ -222,12 +222,12 @@ public class LinkedList {
 	 * A textual representation of this list, for debugging.
 	 */
 	public String toString() {
-		if (size == 0) return "[]";
-    
+		if (size == 0) return "";
+		
 		StringBuilder sb = new StringBuilder();
 		Node current = first;
 		while (current != null) {
-			sb.append(current.toString());
+			sb.append(current.block.toString());
 			current = current.next;
 		}
 		return sb.toString();

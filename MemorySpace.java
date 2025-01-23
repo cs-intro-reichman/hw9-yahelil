@@ -121,8 +121,8 @@ public class MemorySpace {
 	public void defrag() {
 		//TODO: implement defrag test
 		// Sort free list by base address
-		for (int i = 0; i < freeList.size - 1; i++) {
-			for (int j = 0; j < freeList.size - i - 1; j++) {
+		for (int i = 0; i < freeList.getSize() - 1; i++) {
+			for (int j = 0; j < freeList.getSize() - i - 1; j++) {
 				MemoryBlock current = freeList.getBlock(j);
 				MemoryBlock next = freeList.getBlock(j + 1);
 				
@@ -139,7 +139,7 @@ public class MemorySpace {
 		}
 		
 		// Merge adjacent blocks
-		for (int i = 0; i < freeList.size - 1; i++) {
+		for (int i = 0; i < freeList.getSize() - 1; i++) {
 			MemoryBlock current = freeList.getBlock(i);
 			MemoryBlock next = freeList.getBlock(i + 1);
 			

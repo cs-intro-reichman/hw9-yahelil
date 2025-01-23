@@ -5,7 +5,7 @@ public class LinkedList {
 	
 	private Node first; // pointer to the first element of this list
 	private Node last;  // pointer to the last element of this list
-	public int size;   // number of elements in this list
+	private int size;   // number of elements in this list
 	
 	/**
 	 * Constructs a new list.
@@ -16,6 +16,18 @@ public class LinkedList {
 		size = 0;
 	}
 	
+	public Node getFirst() {
+		return first;
+	}
+	
+	public Node getLast() {
+		return last;
+	}
+	
+	public int getSize() {
+		return size;
+	}
+
 	/**
 	 * Gets the node located at the given index in this list. 
 	 * 
@@ -41,7 +53,7 @@ public class LinkedList {
 		
 		return current;
 	}
-	
+
 	/**
 	 * Creates a new Node object that points to the given memory block, 
 	 * and inserts the node at the given index in this list.

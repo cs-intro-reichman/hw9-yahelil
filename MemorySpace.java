@@ -61,15 +61,15 @@ public class MemorySpace {
 		if (length <= 0) {
 			throw new IllegalArgumentException("Block length must be greater than 0.");
 		}
-	
+
 		for (int i = 0; i < freeList.getSize(); i++) {
 			MemoryBlock freeBlock = freeList.getBlock(i);
-	
+
 			if (freeBlock.length >= length) {
 				// Create the allocated block
 				MemoryBlock allocatedBlock = new MemoryBlock(freeBlock.baseAddress, length);
 				allocatedList.addLast(allocatedBlock);
-	
+
 				if (freeBlock.length == length) {
 					// Exact match: remove the free block entirely
 					freeList.remove(i);
@@ -78,13 +78,37 @@ public class MemorySpace {
 					freeBlock.baseAddress += length;
 					freeBlock.length -= length;
 				}
-	
+
 				return allocatedBlock.baseAddress;
 			}
 		}
-	
+
+		// No suitable block found: attempt defragmentation and retry
+		defrag();
+
+		// Retry after defragmentation
+		for (int i = 0; i < freeList.getSize(); i++) {
+			MemoryBlock freeBlock = freeList.getBlock(i);
+
+			if (freeBlock.length >= length) {
+				MemoryBlock allocatedBlock = new MemoryBlock(freeBlock.baseAddress, length);
+				allocatedList.addLast(allocatedBlock);
+
+				if (freeBlock.length == length) {
+					freeList.remove(i);
+				} else {
+					freeBlock.baseAddress += length;
+					freeBlock.length -= length;
+				}
+
+				return allocatedBlock.baseAddress;
+			}
+		}
+
+		// Allocation failed even after defragmentation
 		return -1;
 	}
+
 	
 
 
@@ -97,29 +121,29 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		if (allocatedList.getSize() == 0) {
-			throw new IllegalStateException("No blocks are currently allocated.");
-		}
-	
+		// Locate the block in allocatedList
+		MemoryBlock blockToFree = null;
 		for (int i = 0; i < allocatedList.getSize(); i++) {
 			MemoryBlock allocatedBlock = allocatedList.getBlock(i);
 	
 			if (allocatedBlock.baseAddress == address) {
-				// Remove from allocated list
+				blockToFree = allocatedBlock;
 				allocatedList.remove(i);
-	
-				// Insert into free list in sorted order
-				insertInFreeList(allocatedBlock);
-	
-				// Defragment the free list after insertion
-				defrag();
-				return;
+				break;
 			}
 		}
 	
-		throw new IllegalArgumentException("Block with base address " + address + " not found in allocated list.");
-	}
+		if (blockToFree == null) {
+			throw new IllegalArgumentException("Block with base address " + address + " not found in allocated list.");
+		}
 	
+		// Add the block to the free list
+		insertInFreeList(blockToFree);
+	
+		// Defragment the free list after adding the block
+		defrag();
+	}
+
 	private void insertInFreeList(MemoryBlock block) {
 		for (int i = 0; i < freeList.getSize(); i++) {
 			MemoryBlock freeBlock = freeList.getBlock(i);
@@ -138,22 +162,32 @@ public class MemorySpace {
 	 */
 	public void defrag() {
 		if (freeList.getSize() <= 1) {
-			// No defragmentation needed if the list is empty or has one block
-			return;
+			return; // No defragmentation needed for empty or single-block lists
 		}
-
-		// Iterate through the free list and merge adjacent blocks
-		for (int i = 0; i < freeList.getSize() - 1; i++) {
+	
+		// Create a new list to store defragmented blocks
+		LinkedList newFreeList = new LinkedList();
+	
+		// Traverse the current free list and merge adjacent blocks
+		MemoryBlock prev = freeList.getBlock(0);
+		for (int i = 1; i < freeList.getSize(); i++) {
 			MemoryBlock current = freeList.getBlock(i);
-			MemoryBlock next = freeList.getBlock(i + 1);
-
-			// Merge blocks if they are adjacent
-			if (current.baseAddress + current.length == next.baseAddress) {
-				current.length += next.length; // Extend the current block
-				freeList.remove(i + 1); // Remove the merged block
-				i--; // Adjust index after removal
+	
+			if (prev.baseAddress + prev.length == current.baseAddress) {
+				// Merge current block into the previous block
+				prev.length += current.length;
+			} else {
+				// Add the previous block to the new list and update `prev`
+				newFreeList.addLast(prev);
+				prev = current;
 			}
 		}
+	
+		// Add the last processed block to the new list
+		newFreeList.addLast(prev);
+	
+		// Replace the old free list with the new defragmented list
+		freeList = newFreeList;
 	}
 
 		

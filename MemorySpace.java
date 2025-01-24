@@ -59,20 +59,19 @@ public class MemorySpace {
 	 */
 	public int malloc(int length) {
 		ListIterator it = freeList.iterator();
-		int index = 0;
 		
-		while (it.hasNext()) {
-			MemoryBlock freeBlock = it.next();
+		for (int i = 0; i < freeList.getSize(); i++) {
+			MemoryBlock freeBlock = freeList.getBlock(i);
 			
 			if (freeBlock.length >= length) {
-				// Create new allocated block
+				// Create allocated block
 				MemoryBlock allocatedBlock = new MemoryBlock(freeBlock.baseAddress, length);
 				allocatedList.addLast(allocatedBlock);
 				
 				// Update free block
 				if (freeBlock.length == length) {
-					// Remove the entire free block
-					freeList.remove(freeBlock);
+					// Exact match: remove entire free block
+					freeList.remove(i);
 				} else {
 					// Adjust free block's base address and length
 					freeBlock.baseAddress += length;
@@ -81,8 +80,6 @@ public class MemorySpace {
 				
 				return allocatedBlock.baseAddress;
 			}
-			
-			index++;
 		}
 		
 		return -1;
@@ -97,21 +94,21 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		ListIterator it = allocatedList.iterator();
-		
-		while (it.hasNext()) {
-			MemoryBlock block = it.next();
-			
-			if (block.baseAddress == address) {
-				// Remove from allocated list
-				allocatedList.remove(block);
-				
-				// Add to end of free list
-				freeList.addLast(block);
-				return;
-			}
-		}
-	}
+    ListIterator it = allocatedList.iterator();
+    
+    for (int i = 0; i < allocatedList.getSize(); i++) {
+        MemoryBlock block = allocatedList.getBlock(i);
+        
+        if (block.baseAddress == address) {
+            // Remove from allocated list
+            allocatedList.remove(i);
+            
+            // Add to end of free list
+            freeList.addLast(block);
+            return;
+        }
+    }
+}
 	
 	/**
 	 * Performs defragmantation of this memory space.
@@ -119,7 +116,6 @@ public class MemorySpace {
 	 * In this implementation Malloc does not call defrag.
 	 */
 	public void defrag() {
-		//TODO: implement defrag test
 		// Sort free list by base address
 		for (int i = 0; i < freeList.getSize() - 1; i++) {
 			for (int j = 0; j < freeList.getSize() - i - 1; j++) {

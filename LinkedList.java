@@ -85,16 +85,18 @@ public class LinkedList {
 			first = n;
 			last = n;
 		} else if (index == 0) {
-			addFirst(block);
+			n.next = first;
+        	first = n;
 		} else if (index == size) {
-			addLast(block);
+			last.next = n;
+        	last = n;
 		} else {
 			// Insert in the middle
 			Node prev = getNode(index - 1);
 			n.next = prev.next;
 			prev.next = n;
-			size++;
 		}
+		size++;
 	}
 
 	/**

@@ -107,7 +107,8 @@ public class LinkedList {
 	 *        the given memory block
 	 */
 	public void addLast(MemoryBlock block) {
-		Node n = new Node(block);
+		if (block != null){
+			Node n = new Node(block);
 		
 		if (size == 0) {
 			first = n;
@@ -118,6 +119,7 @@ public class LinkedList {
 		}
 		
 		size++;
+		}
 	}
 	
 	/**

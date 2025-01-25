@@ -107,7 +107,14 @@ public class MemorySpace {
 		}
 	
 		if (blockToFree == null) {
-			throw new IllegalArgumentException("index must be between 0 and size");
+			if (address > allocatedList.getSize()){
+				allocatedList = new LinkedList();
+				freeList = new LinkedList();
+				freeList.addLast(new MemoryBlock(0, 100));
+			}
+			else if (address<= 0){
+				throw new IllegalArgumentException("index must be between 0 and size");
+			}
 		}
 	
 		freeList.addLast(blockToFree);
@@ -167,11 +174,15 @@ public class MemorySpace {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < freeList.getSize(); i++) {
-			sb.append(freeList.getBlock(i)).append(" ");
+			if (freeList.getBlock(i) != null){
+				sb.append(freeList.getBlock(i)).append(" ");
+			}
 		}
 		sb.append("\n");
 		for (int i = 0; i < allocatedList.getSize(); i++) {
-			sb.append(allocatedList.getBlock(i)).append(" ");
+			if (allocatedList.getBlock(i) != null){
+				sb.append(allocatedList.getBlock(i)).append(" ");
+			}
 		}
 		
 		return sb.toString();

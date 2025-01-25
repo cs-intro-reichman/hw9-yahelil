@@ -113,9 +113,9 @@ public class MemorySpace {
 				freeList = new LinkedList();
 				freeList.addLast(new MemoryBlock(0, 100));
 			}
-			//else if (address<= 0){
-			//	throw new IllegalArgumentException("index must be between 0 and size");
-			//}
+			else if (address < 0){
+				throw new IllegalArgumentException("index must be between 0 and size");
+			}
 		}
 		
 	}

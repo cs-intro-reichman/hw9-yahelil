@@ -77,33 +77,9 @@ public class MemorySpace {
 					freeBlock.baseAddress += length;
 					freeBlock.length -= length;
 				}
-				System.out.println("malloc has succeded");
 				return allocatedBlock.baseAddress;
 			}
 		}
-
-		// No suitable block found: attempt defragmentation and retry
-		defrag();
-
-		// Retry after defragmentation
-		for (int i = 0; i < freeList.getSize(); i++) {
-			MemoryBlock freeBlock = freeList.getBlock(i);
-
-			if (freeBlock.length >= length) {
-				MemoryBlock allocatedBlock = new MemoryBlock(freeBlock.baseAddress, length);
-				allocatedList.addLast(allocatedBlock);
-
-				if (freeBlock.length == length) {
-					freeList.remove(i);
-				} else {
-					freeBlock.baseAddress += length;
-					freeBlock.length -= length;
-				}
-				System.out.println("malloc has succeded after defrag");
-				return allocatedBlock.baseAddress;
-			}
-		}
-
 		System.out.println("malloc has failed");
 		return -1;
 	}
@@ -132,12 +108,10 @@ public class MemorySpace {
 		}
 	
 		if (blockToFree == null) {
-			throw new IllegalArgumentException("Block with base address " + address + " not found in allocated list.");
+			throw new IllegalArgumentException("index must be between 0 and size");
 		}
 	
 		freeList.addLast(blockToFree);
-	
-		//defrag();
 	}
 
 	/**

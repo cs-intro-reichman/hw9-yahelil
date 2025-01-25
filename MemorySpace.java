@@ -105,8 +105,9 @@ public class MemorySpace {
 				break;
 			}
 		}
-	
-		if (blockToFree == null) {
+		freeList.addLast(blockToFree);
+		
+		if (blockToFree == null){
 			if (address > allocatedList.getSize()){
 				allocatedList = new LinkedList();
 				freeList = new LinkedList();
@@ -116,8 +117,7 @@ public class MemorySpace {
 				throw new IllegalArgumentException("index must be between 0 and size");
 			}
 		}
-	
-		freeList.addLast(blockToFree);
+		
 	}
 
 	/**

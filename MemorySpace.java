@@ -71,14 +71,13 @@ public class MemorySpace {
 				allocatedList.addLast(allocatedBlock);
 
 				if (freeBlock.length == length) {
-					// Exact match: remove the free block entirely
 					freeList.remove(i);
 				} else {
 					// Adjust free block's baseAddress and length
 					freeBlock.baseAddress += length;
 					freeBlock.length -= length;
 				}
-
+				System.out.println("malloc has succeded");
 				return allocatedBlock.baseAddress;
 			}
 		}
@@ -100,12 +99,12 @@ public class MemorySpace {
 					freeBlock.baseAddress += length;
 					freeBlock.length -= length;
 				}
-
+				System.out.println("malloc has succeded after defrag");
 				return allocatedBlock.baseAddress;
 			}
 		}
 
-		// Allocation failed even after defragmentation
+		System.out.println("malloc has failed");
 		return -1;
 	}
 
@@ -121,7 +120,6 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
-		// Locate the block in allocatedList
 		MemoryBlock blockToFree = null;
 		for (int i = 0; i < allocatedList.getSize(); i++) {
 			MemoryBlock allocatedBlock = allocatedList.getBlock(i);
@@ -137,24 +135,11 @@ public class MemorySpace {
 			throw new IllegalArgumentException("Block with base address " + address + " not found in allocated list.");
 		}
 	
-		// Add the block to the free list
-		insertInFreeList(blockToFree);
+		freeList.addLast(blockToFree);
 	
-		// Defragment the free list after adding the block
-		defrag();
+		//defrag();
 	}
 
-	private void insertInFreeList(MemoryBlock block) {
-		for (int i = 0; i < freeList.getSize(); i++) {
-			MemoryBlock freeBlock = freeList.getBlock(i);
-			if (block.baseAddress < freeBlock.baseAddress) {
-				freeList.add(i, block); // Insert before the current block
-				return;
-			}
-		}
-		// If not inserted earlier, add to the end of the list
-		freeList.addLast(block);
-	}
 	/**
 	 * Performs defragmantation of this memory space.
 	 * Normally, called by malloc, when it fails to find a memory block of the requested size.
@@ -162,13 +147,12 @@ public class MemorySpace {
 	 */
 	public void defrag() {
 		if (freeList.getSize() <= 1) {
-			return; // No defragmentation needed for empty or single-block lists
+			return;
 		}
-	
-		// Create a new list to store defragmented blocks
+		sortFreeList();
 		LinkedList newFreeList = new LinkedList();
 	
-		// Traverse the current free list and merge adjacent blocks
+
 		MemoryBlock prev = freeList.getBlock(0);
 		for (int i = 1; i < freeList.getSize(); i++) {
 			MemoryBlock current = freeList.getBlock(i);
@@ -183,12 +167,52 @@ public class MemorySpace {
 			}
 		}
 	
-		// Add the last processed block to the new list
 		newFreeList.addLast(prev);
 	
-		// Replace the old free list with the new defragmented list
 		freeList = newFreeList;
 	}
 
-		
+	public void sortFreeList() {
+		for (int i = 0; i < freeList.getSize() - 1; i++) {
+			for (int j = 0; j < freeList.getSize() - i - 1; j++) {
+				MemoryBlock current = freeList.getBlock(j);
+				MemoryBlock next = freeList.getBlock(j + 1);
+	
+				if (current.baseAddress > next.baseAddress) {
+					// Swap blocks
+					int tempAddress = current.baseAddress;
+					int tempLength = current.length;
+					current.baseAddress = next.baseAddress;
+					current.length = next.length;
+					next.baseAddress = tempAddress;
+					next.length = tempLength;
+				}
+			}
+		}
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < allocatedList.getSize(); i++) {
+			sb.append("    ").append(allocatedList.getBlock(i)).append("\n");
+		}
+		for (int i = 0; i < freeList.getSize(); i++) {
+			sb.append("    ").append(freeList.getBlock(i)).append("\n");
+		}
+		return sb.toString();
+		/*
+		 * StringBuilder sb = new StringBuilder();
+		sb.append("MemorySpace {\n");
+		sb.append("  Allocated blocks: [\n");
+		for (int i = 0; i < allocatedList.getSize(); i++) {
+			sb.append("    ").append(allocatedList.getBlock(i)).append("\n");
+		}
+		sb.append("  ],\n  Free blocks: [\n");
+		for (int i = 0; i < freeList.getSize(); i++) {
+			sb.append("    ").append(freeList.getBlock(i)).append("\n");
+		}
+		sb.append("  ]\n}");
+		return sb.toString();
+		 */
+	}
 }

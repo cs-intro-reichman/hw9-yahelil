@@ -80,7 +80,6 @@ public class MemorySpace {
 				return allocatedBlock.baseAddress;
 			}
 		}
-		System.out.println("malloc has failed");
 		return -1;
 	}
 
@@ -167,12 +166,14 @@ public class MemorySpace {
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < allocatedList.getSize(); i++) {
-			sb.append("    ").append(allocatedList.getBlock(i)).append("\n");
-		}
 		for (int i = 0; i < freeList.getSize(); i++) {
-			sb.append("    ").append(freeList.getBlock(i)).append("\n");
+			sb.append(freeList.getBlock(i)).append(" ");
 		}
+		sb.append("\n");
+		for (int i = 0; i < allocatedList.getSize(); i++) {
+			sb.append(allocatedList.getBlock(i)).append(" ");
+		}
+		
 		return sb.toString();
 		/*
 		 * StringBuilder sb = new StringBuilder();

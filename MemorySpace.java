@@ -95,6 +95,10 @@ public class MemorySpace {
 	 *            the starting address of the block to freeList
 	 */
 	public void free(int address) {
+		System.out.println("size:" + allocatedList.getSize());
+		if (allocatedList.getSize() == 0 && address == 0){
+			throw new IllegalArgumentException("index must be between 0 and size");
+		}
 		MemoryBlock blockToFree = null;
 		for (int i = 0; i < allocatedList.getSize(); i++) {
 			MemoryBlock allocatedBlock = allocatedList.getBlock(i);
@@ -113,7 +117,7 @@ public class MemorySpace {
 				freeList = new LinkedList();
 				allocatedList.addLast(new MemoryBlock(0, 100));
 			}
-			else if (address <= 0){
+			else if (address < 0){
 				throw new IllegalArgumentException("index must be between 0 and size");
 			}
 		}
@@ -171,10 +175,6 @@ public class MemorySpace {
 	}
 
 	public String toString() {
-		//if	(allocatedList.getSize() == 0){
-		//	System.out.println("in");
-		//	return "\n(0 , 100) ";
-		//}
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < freeList.getSize(); i++) {
 			if (freeList.getBlock(i) != null){

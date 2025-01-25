@@ -96,7 +96,7 @@ public class MemorySpace {
 	 */
 	public void free(int address) {
 		System.out.println("size:" + allocatedList.getSize());
-		if (allocatedList.getSize() == 0 && address == 0){
+		if (allocatedList.getSize() == 0){
 			throw new IllegalArgumentException("index must be between 0 and size");
 		}
 		MemoryBlock blockToFree = null;
